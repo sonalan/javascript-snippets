@@ -15,6 +15,15 @@ const touchSupported = () => {
  */
 const isAppleDevice = /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
+/**
+ *
+ * @returns {string}
+ */
+const detectDeviceType = () =>
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+        ? 'Mobile'
+        : 'Desktop';
+
 /***
  *
  * @param element{string}
@@ -28,10 +37,55 @@ const copyToClipboard = element => navigator.clipboard.writeText(document.queryS
  */
 const isBrowserTabInView = () => document.hidden;
 
+/**
+ *
+ * @param el{object}
+ * @returns {{x: (number), y: (number)}}
+ */
+const getScrollPosition = (el = window) => ({
+    x: el.pageXOffset !== undefined ? el.pageXOffset : el.scrollLeft,
+    y: el.pageYOffset !== undefined ? el.pageYOffset : el.scrollTop
+});
+
 /***
  *
  */
 const goToTop = () => window.scrollTo(0, 0);
+
+/**
+ *
+ */
+const scrollToTop = () => {
+    const c = document.documentElement.scrollTop || document.body.scrollTop;
+    if (c > 0) {
+        window.requestAnimationFrame(scrollToTop);
+        window.scrollTo(0, c - c / 8);
+    }
+};
+
+/**
+ *
+ * @param el{object}
+ * @param className{string}
+ * @returns {boolean}
+ */
+const hasClass = (el, className) => el.classList.contains(className);
+
+/**
+ *
+ * @param el{object}
+ * @param className{string}
+ * @returns {boolean}
+ */
+const toggleClass = (el, className) => el.classList.toggle(className);
+
+/**
+ *
+ * @param el{object[]}
+ */
+const hideMe = (...el) => [...el].forEach(e => (e.style.display = 'none'));
+
+
 
 /***
  *
@@ -76,6 +130,35 @@ const onClickOutsideElement = (element, callback) => {
     });
 };
 
+
+/** url snippets **/
+/**
+ *
+ * @returns {string}
+ */
+const currentURL = () => window.location.href;
+
+/**
+ *
+ * @param url
+ * @returns {T}
+ */
+const getURLParameters = url =>
+    (url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(
+        (a, v) => ((a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a),
+        {}
+    );
+/**
+ *
+ * @param fn
+ * @param wait
+ * @param args
+ * @returns {number}
+ */
+const delay = (fn, wait, ...args) => setTimeout(fn, wait, ...args);
+
+
+
 /***
  * number snippets
  ***/
@@ -116,6 +199,7 @@ const celsiusToFahrenheit = (celsius) => celsius * 9/5 + 32;
  */
 const fahrenheitToCelsius = (fahrenheit) => (fahrenheit - 32) * 5/9;
 
+/** date time **/
 
 /***
  *
@@ -135,7 +219,13 @@ const addDaysToDate = (date, n) => {
  */
 const timeFromDate = date => date.toTimeString().slice(0, 8);
 
-
+/**
+ *
+ * @param dateInitial{date}
+ * @param dateFinal{date}
+ * @returns {number}
+ */
+const getDaysDiffBetweenDates = (dateInitial, dateFinal) => (dateFinal - dateInitial) / (1000 * 3600 * 24);
 
 
 /*
@@ -184,4 +274,37 @@ const reverse = str => str.split('').reverse().join('');
  * @returns {string}
  */
 const generateRandomColour = () =>   "#" + Math.floor(Math.random()*16777215).toString(16);
+
+
+/** server requests */
+
+/**
+ *
+ * @param url{string}
+ * @param callback{function}
+ * @param err
+ */
+const httpGet = (url, callback, err = console.error) => {
+    const request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.onload = () => callback(request.responseText);
+    request.onerror = () => err(request);
+    request.send();
+};
+
+/**
+ *
+ * @param url{string}
+ * @param data{object}
+ * @param callback{function}
+ * @param err
+ */
+const httpPost = (url, data, callback, err = console.error) => {
+    const request = new XMLHttpRequest();
+    request.open('POST', url, true);
+    request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+    request.onload = () => callback(request.responseText);
+    request.onerror = () => err(request);
+    request.send(data);
+};
 
