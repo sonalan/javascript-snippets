@@ -283,6 +283,13 @@ const reverse = str => str.split('').reverse().join('');
  */
 const generateRandomColour = () =>   "#" + Math.floor(Math.random()*16777215).toString(16);
 
+/**
+ *
+ * @param str(string)
+ * @returns {string}
+ */
+const spinalCase = str => str.split(/\s|_|(?=[A-Z])/).join("-").toLowerCase();
+
 
 /** server requests */
 
